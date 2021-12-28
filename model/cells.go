@@ -46,18 +46,17 @@ const (
 )
 
 type Change struct {
-	location Index
 	turn     int64
 	reason   ChangeType
 }
 
-func (w *World) ApplyChanges(changes []Change) {
-	for _, c := range changes {
+func (w *World) ApplyChanges(changes map[Index]Change) {
+	for location, c := range changes {
 		switch c.reason {
 			case BIRTH:
-				w.cells[c.location] = newCell(c.turn)
+				w.cells[location] = newCell(c.turn)
 			case DEATH:
-				delete(w.cells, c.location)
+				delete(w.cells, location)
 		}
 	}
 	w.recalculateBorders()
@@ -137,7 +136,12 @@ func (w World) countNeighborsOf(location Index, cache map[Index]int, offset int)
 	return count - offset
 }
 
-func (w World) analize(location Index, turn int64, cache map[Index]int) []Change {
+func (w World) analize(location Index, turn int64, cache map[Index]int, changes map[Index]Change) {
+	_, cellHasChange := changes[location]
+	if cellHasChange {
+		return
+	}
+
 	cell := w.GetCellIn(location.x, location.y) 
 	offset := 0
 	if cell != nil {
@@ -146,32 +150,30 @@ func (w World) analize(location Index, turn int64, cache map[Index]int) []Change
 	c := w.countNeighborsOf(location, cache, offset)
 
 	if c == 3 && cell == nil {
-		return []Change{Change{location:location,turn:turn,reason:BIRTH}}
+		changes[location] = Change{turn:turn,reason:BIRTH}
 	}
 	if (c <2 || c > 3) && cell != nil {
-		return []Change{Change{location:location,turn:turn,reason:DEATH}}
+		changes[location] = Change{turn:turn,reason:DEATH}
 	}
-	return nil
 }
 
-func (w World) analizeNeighborsOf(location Index, turn int64, cache map[Index]int) (changes []Change) {
+func (w World) analizeNeighborsOf(location Index, turn int64, cache map[Index]int, changes map[Index]Change) {
 	x := location.x - 1
 	for x <= location.x + 1 {
 		y := location.y - 1
 		for y <= location.y + 1 {
-			changes = append(changes, w.analize(NewIndex(x,y), turn, cache)...)
+			w.analize(NewIndex(x,y), turn, cache, changes)
 			y++
 		}
 		x++
 	}
-	return
 }
 
 func (w *World) Evolve() {
 	countCache := make(map[Index]int)
-	changes := make([]Change, 0)
+	changes := make(map[Index]Change)
 	for cellLocation, _ := range(w.cells) {
-		changes = append(changes, w.analizeNeighborsOf(cellLocation, w.turn+1, countCache)...)
+		w.analizeNeighborsOf(cellLocation, w.turn+1, countCache, changes)
 	}
 	w.turn++
 	w.changes = len(changes)
