@@ -16,15 +16,6 @@ func main() {
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	/*
-	w := model.NewWorld()
-	w.AddCellIn(0,1,0)
-	w.AddCellIn(1,2,0)
-	w.AddCellIn(2,0,0)
-	w.AddCellIn(2,1,0)
-	w.AddCellIn(2,2,0)
-	*/
-
 	w := model.ReadWorld()
 
 	cursor.Hide()
@@ -32,7 +23,13 @@ func main() {
 
 	go display(w, -10, -10, 60, 100)
 
-	<-sigs
+	s := <- sigs
+	switch s {
+	case syscall.SIGINT:
+		fmt.Println("\nAs you wish")
+	case syscall.SIGTERM:
+		fmt.Println("I've been told to stop")
+	}
 	fmt.Println("Bye")
 }
 
