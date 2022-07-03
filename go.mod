@@ -1,4 +1,4 @@
-module life
+module github.com/daniel-munoz/life
 
 go 1.16
 
