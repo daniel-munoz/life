@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Cell struct {
 	birthTurn int64
@@ -15,6 +18,7 @@ type World struct {
 	topLeft, bottomRight Index
 	turn                 int64
 	changes              int
+	start                time.Time
 }
 
 func newCell(turn int64) *Cell {
@@ -31,6 +35,7 @@ func NewWorld() World {
 		topLeft:     Index{0,0},
 		bottomRight: Index{0,0},
 		turn:        0,
+		start:       time.Now(),
 	}
 }
 
@@ -72,7 +77,15 @@ func (w World) Print() {
 }
 
 func (w World) PrintWindow(topLeft, bottomRight Index) {
-	fmt.Printf("Turn: %d   Live Cells: %d   Limits: (%d,%d) -> (%d, %d)   Changes: %d     \n", w.turn, len(w.cells), w.topLeft.x, w.topLeft.y, w.bottomRight.x, w.bottomRight.y, w.changes)
+	fmt.Printf("Turn: %d  Live Cells: %d  Limits: (%d,%d) -> (%d, %d) Changes: %d Age: %s    \n",
+	           w.turn,
+		   len(w.cells),
+		   w.topLeft.x,
+		   w.topLeft.y,
+		   w.bottomRight.x,
+		   w.bottomRight.y,
+		   w.changes,
+		   time.Now().Sub(w.start))
 	x, y := topLeft.x, topLeft.y
 	for y <= bottomRight.y {
 		for x <= bottomRight.x {
