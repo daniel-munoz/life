@@ -12,11 +12,24 @@ import (
 )
 
 func main() {
+	var (
+		w   model.World
+		err error
+	)
+
 	sigs := make(chan os.Signal, 1)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	w := model.ReadWorld()
+	if len(os.Args) > 1 {
+		w, err = model.ReadWorld(&os.Args[1])
+		if err != nil {
+			fmt.Printf("Error reading sample: %s\n", err.Error())
+			os.Exit(1)
+		}
+	} else {
+		w, _ = model.ReadWorld(nil)
+	}
 
 	cursor.Hide()
 	defer cursor.Show()

@@ -2,14 +2,28 @@ package model
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
-func ReadWorld() World {
-	var x, y int64
+func ReadWorld(sampleName *string) (World, error) {
+	var (
+		x, y    int64
+		scanner *bufio.Scanner
+	)
 	newWorld := NewWorld()
 
-	scanner := bufio.NewScanner(os.Stdin)
+	if sampleName == nil {
+		scanner = bufio.NewScanner(os.Stdin)
+	} else {
+		filename := fmt.Sprintf("./samples/%s.life", *sampleName)
+		f, err := os.Open(filename)
+		if err != nil {
+			return newWorld, err
+		}
+		defer f.Close()
+		scanner = bufio.NewScanner(f)
+	}
 	for scanner.Scan() {
 		line := scanner.Text()
 		x = 0
@@ -21,5 +35,5 @@ func ReadWorld() World {
 		}
 		y++
 	}
-	return newWorld
+	return newWorld, nil
 }
