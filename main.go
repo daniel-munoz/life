@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/atomicgo/cursor"
-	"life/model"
+	"github.com/daniel-munoz/life/model"
 )
 
 func main() {
