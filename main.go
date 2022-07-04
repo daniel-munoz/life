@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/atomicgo/cursor"
+	"atomicgo.dev/cursor"
 	"github.com/daniel-munoz/life/model"
 )
 

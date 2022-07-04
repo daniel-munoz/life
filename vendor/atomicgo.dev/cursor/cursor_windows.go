@@ -6,6 +6,13 @@ import (
 	"unsafe"
 )
 
+var target Writer = os.Stdout
+
+// SetTarget allows for any arbitrary Writer to be used
+func SetTarget(w Writer) {
+	target = w
+}
+
 // Up moves the cursor n lines up relative to the current position.
 func Up(n int) {
 	move(0, -n)
@@ -33,7 +40,7 @@ func Left(n int) {
 }
 
 func move(x int, y int) {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(target.Fd())
 
 	var csbi consoleScreenBufferInfo
 	_, _, _ = procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
@@ -48,7 +55,7 @@ func move(x int, y int) {
 // HorizontalAbsolute moves the cursor to n horizontally.
 // The position n is absolute to the start of the line.
 func HorizontalAbsolute(n int) {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(target.Fd())
 
 	var csbi consoleScreenBufferInfo
 	_, _, _ = procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
@@ -68,7 +75,7 @@ func HorizontalAbsolute(n int) {
 // Don't forget to show the cursor at least at the end of your application.
 // Otherwise the user might have a terminal with a permanently hidden cursor, until he reopens the terminal.
 func Show() {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(target.Fd())
 
 	var cci consoleCursorInfo
 	_, _, _ = procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
@@ -81,7 +88,7 @@ func Show() {
 // Don't forget to show the cursor at least at the end of your application with Show.
 // Otherwise the user might have a terminal with a permanently hidden cursor, until he reopens the terminal.
 func Hide() {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(target.Fd())
 
 	var cci consoleCursorInfo
 	_, _, _ = procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
@@ -92,7 +99,7 @@ func Hide() {
 
 // ClearLine clears the current line and moves the cursor to it's start position.
 func ClearLine() {
-	handle := syscall.Handle(os.Stdout.Fd())
+	handle := syscall.Handle(target.Fd())
 
 	var csbi consoleScreenBufferInfo
 	_, _, _ = procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))

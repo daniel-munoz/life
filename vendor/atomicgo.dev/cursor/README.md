@@ -33,7 +33,7 @@
 <p align="center">
 <strong><a href="#install">Get The Module</a></strong>
 |
-<strong><a href="https://pkg.go.dev/github.com/atomicgo/cursor#section-documentation" target="_blank">Documentation</a></strong>
+<strong><a href="https://pkg.go.dev/atomicgo.dev/cursor#section-documentation" target="_blank">Documentation</a></strong>
 |
 <strong><a href="https://github.com/atomicgo/atomicgo/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></strong>
 |
@@ -46,6 +46,30 @@
   <img src="https://raw.githubusercontent.com/atomicgo/atomicgo/main/assets/header.png" alt="AtomicGo">
 </p>
 
+<p align="center">
+<table>
+<tbody>
+<td align="center">
+<img width="2000" height="0"><br>
+  -----------------------------------------------------------------------------------------------------
+<img width="2000" height="0">
+</td>
+</tbody>
+</table>
+</p>
+<h3  align="center"><pre>go get atomicgo.dev/cursor</pre></h3>
+<p align="center">
+<table>
+<tbody>
+<td align="center">
+<img width="2000" height="0"><br>
+   -----------------------------------------------------------------------------------------------------
+<img width="2000" height="0">
+</td>
+</tbody>
+</table>
+</p>
+
 ## Description
 
 Package cursor contains cross-platform methods to move the terminal cursor in
@@ -53,19 +77,10 @@ different directions. This package can be used to create interactive CLI tools
 and games, live charts, algorithm visualizations and other updatable output of
 any kind.
 
+Works niceley with https://github.com/atomicgo/keyboard
+
 Special thanks to github.com/k0kubun/go-ansi which this project is based on.
 
-## Install
-
-```console
-# Execute this command inside your project
-go get -u github.com/atomicgo/cursor
-```
-
-```go
-// Add this to your imports
-import "github.com/atomicgo/cursor"
-```
 
 ## Usage
 
@@ -153,6 +168,13 @@ func Right(n int)
 Right moves the cursor n characters to the right relative to the current
 position.
 
+#### func  SetTarget
+
+```go
+func SetTarget(w Writer)
+```
+SetTarget allows for any arbitrary Writer to be used
+
 #### func  Show
 
 ```go
@@ -184,6 +206,12 @@ func StartOfLineUp(n int)
 ```
 StartOfLineUp moves the cursor up by n lines, then moves to cursor to the start
 of the line.
+
+#### func  TestCustomIOWriter
+
+```go
+func TestCustomIOWriter(t *testing.T)
+```
 
 #### func  Up
 
@@ -229,6 +257,17 @@ Clear clears the content of the Area.
 func (area *Area) Update(content string)
 ```
 Update overwrites the content of the Area.
+
+#### type Writer
+
+```go
+type Writer interface {
+	io.Writer
+	Fd() uintptr
+}
+```
+
+Writer is an expanded io.Writer interface with a file descriptor.
 
 ---
 

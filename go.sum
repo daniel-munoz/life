@@ -1,2 +1,2 @@
-github.com/atomicgo/cursor v0.0.1 h1:xdogsqa6YYlLfM+GyClC/Lchf7aiMerFiZQn7soTOoU=
-github.com/atomicgo/cursor v0.0.1/go.mod h1:cBON2QmmrysudxNBFthvMtN32r3jxVRIvzkUiF/RuIk=
+atomicgo.dev/cursor v0.1.1 h1:0t9sxQomCTRh5ug+hAMCs59x/UmC9QL6Ci5uosINKD4=
+atomicgo.dev/cursor v0.1.1/go.mod h1:Lr4ZJB3U7DfPPOkbH7/6TOtJ4vFGHlgj1nc+n900IpU=
