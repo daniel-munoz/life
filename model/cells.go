@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -77,7 +78,12 @@ func (w World) Print() {
 }
 
 func (w World) PrintWindow(topLeft, bottomRight Index) {
-	fmt.Printf("Turn: %d  Live Cells: %d  Limits: (%d,%d) -> (%d, %d) Changes: %d Age: %s    \n",
+	fmt.Print(w.WindowContent(topLeft, bottomRight))
+}
+
+func (w World) WindowContent(topLeft, bottomRight Index) string {
+	buffer := &strings.Builder{}
+	fmt.Fprintf(buffer, "Turn: %d  Live Cells: %d  Limits: (%d,%d) -> (%d, %d) Changes: %d Age: %s    \n",
 	           w.turn,
 		   len(w.cells),
 		   w.topLeft.x,
@@ -91,16 +97,17 @@ func (w World) PrintWindow(topLeft, bottomRight Index) {
 		for x <= bottomRight.x {
 			c := w.GetCellIn(x, y)
 			if c != nil {
-				fmt.Print("x")
+				fmt.Fprint(buffer, "x")
 			} else {
-				fmt.Print(" ")
+				fmt.Fprint(buffer, " ")
 			}
 			x++
 		}
 		x = topLeft.x
 		y++
-		fmt.Println()
+		fmt.Fprintln(buffer)
 	}
+	return buffer.String()
 }
 
 func (w *World) recalculateBorders() {

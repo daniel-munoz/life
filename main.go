@@ -34,7 +34,8 @@ func main() {
 	cursor.Hide()
 	defer cursor.Show()
 
-	go display(w, -10, -10, 60, 100)
+	area := cursor.NewArea()
+	go display(&area, w, -10, -10, 60, 100)
 
 	s := <- sigs
 	switch s {
@@ -46,13 +47,12 @@ func main() {
 	fmt.Println("Bye")
 }
 
-func display(w model.World, top, left, bottom, right int64) {
+func display(area *cursor.Area, w model.World, top, left, bottom, right int64) {
 	topLeft, bottomRight := model.NewIndex(left,top), model.NewIndex(right,bottom)
-	w.PrintWindow(topLeft, bottomRight)
-	for true {
+	area.Update(w.WindowContent(topLeft, bottomRight))
+	for {
 		time.Sleep(250 * time.Millisecond)
 		w.Evolve()
-		cursor.Up(int(bottom - top + 2))
-		w.PrintWindow(topLeft, bottomRight)
+		area.Update(w.WindowContent(topLeft, bottomRight))
 	}
 }
