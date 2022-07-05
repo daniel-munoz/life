@@ -37,6 +37,9 @@ func (gl *gameListener) Start() {
 			event = Left
 		case keys.Right:
 			event = Right
+		case keys.CtrlC:
+			event = Stop
+			stop = true
 		case keys.RuneKey:
 			switch k.String() {
 			case "q":

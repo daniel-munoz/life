@@ -20,7 +20,7 @@ func main() {
 
 	sigs := make(chan os.Signal, 1)
 
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigs, syscall.SIGTERM)
 
 	if len(os.Args) > 1 {
 		w, err = model.ReadWorld(&os.Args[1])
@@ -38,23 +38,30 @@ func main() {
 	area := cursor.NewArea()
 	go display(&area, w, -10, -10, 40, 80)
 
-	s := <- sigs
+	s := <-sigs
 	switch s {
-	case syscall.SIGINT:
-		fmt.Println("\nAs you wish")
 	case syscall.SIGTERM:
-		fmt.Println("I've been told to stop")
+		area.Update("I've been told to stop")
 	}
-	fmt.Println("Bye")
 }
 
 func display(area *cursor.Area, w model.World, top, left, bottom, right int64) {
 	listener := keyboard.NewListener()
 	listener.Start()
-	topLeft, bottomRight := model.NewIndex(left,top), model.NewIndex(right,bottom)
-	area.Update(w.WindowContent(topLeft, bottomRight))
+	helpTimer := 8
 	for {
 		time.Sleep(250 * time.Millisecond)
+		if helpTimer > 0 {
+			area.Update(`Keys:
+  Up   : moves window 1 space up       Down : moves window 1 space down
+  Left : moves window 1 space left     Right: moves window 1 space right
+  I    : moves window 10 spaces up     K    : moves window 10 spaces down
+  J    : moves window 10 spaces left   L    : moves window 10 spaces right
+  Q    : ends the program              H    : displays this help
+  `)
+			helpTimer--
+			continue
+		}
 		w.Evolve()
 
 		topLeft, bottomRight := model.NewIndex(left,top), model.NewIndex(right,bottom)
@@ -63,7 +70,7 @@ func display(area *cursor.Area, w model.World, top, left, bottom, right int64) {
 		check := listener.Check()
 		switch(check) {
 		case keyboard.Stop:
-			fmt.Println("\nTime to stop")
+			area.Update("Time to stop")
 			os.Exit(0)
 		case keyboard.Up:
 			top--
@@ -89,6 +96,8 @@ func display(area *cursor.Area, w model.World, top, left, bottom, right int64) {
 		case keyboard.PageRight:
 			left+=10
 			right+=10
+		case keyboard.Help:
+			helpTimer = 8
 		default:
 		}
 	}
