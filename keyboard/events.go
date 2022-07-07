@@ -13,6 +13,7 @@ const (
 	PageRight
 	Help
 	Stop
+	Pause
 	None
 )
 

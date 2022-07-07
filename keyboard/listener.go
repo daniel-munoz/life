@@ -40,6 +40,8 @@ func (gl *gameListener) Start() {
 		case keys.CtrlC:
 			event = Stop
 			stop = true
+		case keys.Space:
+			event = Pause
 		case keys.RuneKey:
 			switch k.String() {
 			case "q":

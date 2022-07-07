@@ -6,24 +6,21 @@ import (
 	"os"
 )
 
-func ReadWorld(sampleName *string) (World, error) {
+func ReadWorld(sampleName string) (World, error) {
 	var (
 		x, y    int64
 		scanner *bufio.Scanner
 	)
 	newWorld := NewWorld()
 
-	if sampleName == nil {
-		scanner = bufio.NewScanner(os.Stdin)
-	} else {
-		filename := fmt.Sprintf("./samples/%s.life", *sampleName)
-		f, err := os.Open(filename)
-		if err != nil {
-			return newWorld, err
-		}
-		defer f.Close()
-		scanner = bufio.NewScanner(f)
+	filename := fmt.Sprintf("./samples/%s.life", sampleName)
+	f, err := os.Open(filename)
+	if err != nil {
+		return newWorld, err
 	}
+	defer f.Close()
+
+	scanner = bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 		x = 0
