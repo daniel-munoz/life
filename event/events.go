@@ -1,4 +1,4 @@
-package keyboard
+package event
 
 type Event int
 

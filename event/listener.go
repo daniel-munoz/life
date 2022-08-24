@@ -1,6 +1,10 @@
-package keyboard
+package event
 
 import (
+    "os"
+    "os/signal"
+    "syscall"
+
     "atomicgo.dev/keyboard"
     "atomicgo.dev/keyboard/keys"
 )
@@ -20,6 +24,10 @@ type gameListener struct {
 }
 
 func (gl *gameListener) Start() {
+	sigs := make(chan os.Signal, 1)
+
+	signal.Notify(sigs, syscall.SIGTERM)
+
 	if gl.running {
 		return
 	}
@@ -67,6 +75,15 @@ func (gl *gameListener) Start() {
 		}
 		return stop, nil
 	})
+	go func() {
+		select {
+		case s := <-sigs:
+			switch s {
+			case syscall.SIGTERM:
+				gl.queue <- Stop
+			}
+		}
+	}()
 }
 
 func (gl *gameListener) Check() Event {
