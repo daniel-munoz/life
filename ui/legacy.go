@@ -8,6 +8,16 @@ import (
 	"github.com/daniel-munoz/life/model"
 )
 
+const (
+	options string = `Keys:
+  Up   : moves window 1 space up       Down : moves window 1 space down
+  Left : moves window 1 space left     Right: moves window 1 space right
+  I    : moves window 10 spaces up     K    : moves window 10 spaces down
+  J    : moves window 10 spaces left   L    : moves window 10 spaces right
+  Q    : ends the program              H    : displays this help
+`
+)
+
 func Show(w model.World, top, left, bottom, right int64) {
 	stopChannel := make(chan struct{})
 
@@ -24,13 +34,7 @@ func Show(w model.World, top, left, bottom, right int64) {
 	go func() {
 		for {
 			if showHelp {
-				display.UpdateAndLock(`Keys:
-  Up   : moves window 1 space up       Down : moves window 1 space down
-  Left : moves window 1 space left     Right: moves window 1 space right
-  I    : moves window 10 spaces up     K    : moves window 10 spaces down
-  J    : moves window 10 spaces left   L    : moves window 10 spaces right
-  Q    : ends the program              H    : displays this help
-  `, 3500 * time.Millisecond)
+				display.UpdateAndLock(options, 4500 * time.Millisecond)
   				showHelp = false
 			}
 			if !paused {
