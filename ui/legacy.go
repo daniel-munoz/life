@@ -1,4 +1,4 @@
-package ui 
+package ui
 
 import (
 	"time"
@@ -18,6 +18,10 @@ const (
 `
 )
 
+// Action is a function that updates the status of the world.
+type Action func()
+
+// Show displays the world in a terminal window.
 func Show(w model.World, top, left, bottom, right int64) {
 	stopChannel := make(chan struct{})
 
@@ -28,63 +32,33 @@ func Show(w model.World, top, left, bottom, right int64) {
 
 	listener := event.NewListener()
 	listener.Start()
-	showHelp := false
 
-	paused := false
+	gameView := NewGameView(top, left, bottom, right, stopChannel)
+
 	go func() {
 		for {
-			if showHelp {
-				display.UpdateAndLock(options, 4500 * time.Millisecond)
-  				showHelp = false
+			if gameView.ShowHelp() {
+				display.UpdateAndLock(options, 4500*time.Millisecond)
+				gameView.ToggleHelp()
 			}
-			if !paused {
+			if !gameView.IsPaused() {
 				w.Evolve()
 			}
 
-			topLeft, bottomRight := model.NewIndex(left,top), model.NewIndex(right,bottom)
-			display.UpdateAndLock(w.WindowContent(topLeft, bottomRight), 200 * time.Millisecond)
+			topLeft, bottomRight := gameView.TopLeft(), gameView.BottomRight()
+			display.UpdateAndLock(w.WindowContent(topLeft, bottomRight), 200*time.Millisecond)
 
 			check := listener.Check()
-			switch(check) {
-			case event.Stop:
-				stopChannel <- struct{}{}
+			gameView.Execute(check)
+			if gameView.Ended() {
 				return
-			case event.Up:
-				top--
-				bottom--
-			case event.Down:
-				top++
-				bottom++
-			case event.Left:
-				left--
-				right--
-			case event.Right:
-				left++
-				right++
-			case event.PageUp:
-				top-=10
-				bottom-=10
-			case event.PageDown:
-				top+=10
-				bottom+=10
-			case event.PageLeft:
-				left-=10
-				right-=10
-			case event.PageRight:
-				left+=10
-				right+=10
-			case event.Help:
-				showHelp = true
-			case event.Pause:
-				paused = !paused
-			default:
 			}
 		}
 	}()
 	for {
 		select {
 		case <-stopChannel:
-				display.UpdateAndClose("Time to stop")
+			display.UpdateAndClose("Time to stop")
 			return
 		}
 	}
