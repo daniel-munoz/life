@@ -5,12 +5,13 @@ import (
 	"os"
 
 	"github.com/daniel-munoz/life/model"
+	"github.com/daniel-munoz/life/types"
 	"github.com/daniel-munoz/life/ui"
 )
 
 func main() {
 	var (
-		w   model.World
+		w   types.World
 		err error
 		sampleName = "gliders"
 	)

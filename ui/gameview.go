@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/daniel-munoz/life/event"
 	"github.com/daniel-munoz/life/model"
+	"github.com/daniel-munoz/life/types"
 )
 
 // GameView is the view of the game. It shows the world in a view window, defined
@@ -71,12 +72,12 @@ func NewGameView(top, left, bottom, right int64, stopChannel chan struct{}) *Gam
 }
 
 // TopLeft returns the top and left coordinates of the view window.
-func (gv *GameView) TopLeft() model.Index {
+func (gv *GameView) TopLeft() types.Index {
 	return model.NewIndex(gv.left, gv.top)
 }
 
 // BottomRight returns the bottom and right coordinates of the view window.
-func (gv *GameView) BottomRight() model.Index {
+func (gv *GameView) BottomRight() types.Index {
 	return model.NewIndex(gv.right, gv.bottom)
 }
 

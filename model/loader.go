@@ -4,14 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/daniel-munoz/life/types"
+	"github.com/daniel-munoz/life/model/internal"
 )
 
-func ReadWorld(sampleName string) (World, error) {
+func ReadWorld(sampleName string) (types.World, error) {
 	var (
 		x, y    int64
 		scanner *bufio.Scanner
 	)
-	newWorld := NewWorld()
+	newWorld := internal.NewWorld()
 
 	filename := fmt.Sprintf("./samples/%s.life", sampleName)
 	f, err := os.Open(filename)

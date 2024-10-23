@@ -1,22 +1,32 @@
-package model
+package internal
 
 import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/daniel-munoz/life/types"
 )
+
+type index struct {
+	x, y int64
+}
+
+func (i index) X() int64 {
+	return i.x
+}
+
+func (i index) Y() int64 {
+	return i.y
+}
 
 type Cell struct {
 	birthTurn int64
 }
 
-type Index struct {
-	x, y      int64
-}
-
 type World struct {
-	cells                map[Index]*Cell
-	topLeft, bottomRight Index
+	cells                map[index]*Cell
+	topLeft, bottomRight index
 	turn                 int64
 	changes              int
 	start                time.Time
@@ -26,22 +36,22 @@ func newCell(turn int64) *Cell {
 	return &Cell{birthTurn: turn}
 }
 
-func NewIndex(x, y int64) Index {
-	return Index{x:x,y:y}
+func NewIndex(x, y int64) types.Index {
+	return index{x:x,y:y}
 }
 
-func NewWorld() World {
-	return World{
-		cells:       make(map[Index]*Cell),
-		topLeft:     Index{0,0},
-		bottomRight: Index{0,0},
+func NewWorld() *World {
+	return &World{
+		cells:       make(map[index]*Cell),
+		topLeft:     index{0,0},
+		bottomRight: index{0,0},
 		turn:        0,
 		start:       time.Now(),
 	}
 }
 
 func (w World) GetCellIn(x, y int64) *Cell {
-	return w.cells[Index{x:x,y:y}]
+	return w.cells[index{x:x,y:y}]
 }
 
 type ChangeType int
@@ -56,7 +66,7 @@ type Change struct {
 	reason   ChangeType
 }
 
-func (w *World) ApplyChanges(changes map[Index]Change) {
+func (w *World) ApplyChanges(changes map[index]Change) {
 	for location, c := range changes {
 		switch c.reason {
 			case BIRTH:
@@ -69,7 +79,7 @@ func (w *World) ApplyChanges(changes map[Index]Change) {
 }
 
 func (w *World) AddCellIn(x, y, turn int64) {
-	w.cells[Index{x,y}] = newCell(turn)
+	w.cells[index{x,y}] = newCell(turn)
 	w.recalculateBorders()
 }
 
@@ -77,11 +87,11 @@ func (w World) Print() {
 	w.PrintWindow(w.topLeft, w.bottomRight)
 }
 
-func (w World) PrintWindow(topLeft, bottomRight Index) {
+func (w World) PrintWindow(topLeft, bottomRight types.Index) {
 	fmt.Print(w.WindowContent(topLeft, bottomRight))
 }
 
-func (w World) WindowContent(topLeft, bottomRight Index) string {
+func (w World) WindowContent(topLeft, bottomRight types.Index) string {
 	buffer := &strings.Builder{}
 	fmt.Fprintf(buffer, "Turn: %d  Live Cells: %d  Limits: (%d,%d) -> (%d, %d) Changes: %d Age: %s    \n",
 	           w.turn,
@@ -92,9 +102,9 @@ func (w World) WindowContent(topLeft, bottomRight Index) string {
 		   w.bottomRight.y,
 		   w.changes,
 		   time.Now().Sub(w.start))
-	x, y := topLeft.x, topLeft.y
-	for y <= bottomRight.y {
-		for x <= bottomRight.x {
+	x, y := topLeft.X(), topLeft.Y()
+	for y <= bottomRight.Y() {
+		for x <= bottomRight.X() {
 			c := w.GetCellIn(x, y)
 			if c != nil {
 				fmt.Fprint(buffer, "x")
@@ -103,7 +113,7 @@ func (w World) WindowContent(topLeft, bottomRight Index) string {
 			}
 			x++
 		}
-		x = topLeft.x
+		x = topLeft.X()
 		y++
 		fmt.Fprintln(buffer)
 	}
@@ -113,7 +123,7 @@ func (w World) WindowContent(topLeft, bottomRight Index) string {
 func (w *World) recalculateBorders() {
     var minX, maxX, minY, maxY int64
     first := true
-    for location,_ := range w.cells {
+    for location := range w.cells {
 	    if first {
 		    minX,minY,maxX,maxY = location.x,location.y,location.x,location.y
 		    first = false
@@ -132,11 +142,11 @@ func (w *World) recalculateBorders() {
 		    maxY = location.y
 	    }
     }
-    w.topLeft = Index{x:minX,y:minY}
-    w.bottomRight = Index{x:maxX,y:maxY}
+    w.topLeft = index{x:minX,y:minY}
+    w.bottomRight = index{x:maxX,y:maxY}
 }
 
-func (w World) countNeighborsOf(location Index, cache map[Index]int, offset int) int {
+func (w World) countNeighborsOf(location index, cache map[index]int, offset int) int {
 	count, found := cache[location]
 	if found {
 		return count
@@ -156,7 +166,7 @@ func (w World) countNeighborsOf(location Index, cache map[Index]int, offset int)
 	return count - offset
 }
 
-func (w World) analize(location Index, turn int64, cache map[Index]int, changes map[Index]Change) {
+func (w World) analize(location index, turn int64, cache map[index]int, changes map[index]Change) {
 	_, cellHasChange := changes[location]
 	if cellHasChange {
 		return
@@ -177,12 +187,12 @@ func (w World) analize(location Index, turn int64, cache map[Index]int, changes 
 	}
 }
 
-func (w World) analizeNeighborsOf(location Index, turn int64, cache map[Index]int, changes map[Index]Change) {
+func (w World) analizeNeighborsOf(location index, turn int64, cache map[index]int, changes map[index]Change) {
 	x := location.x - 1
 	for x <= location.x + 1 {
 		y := location.y - 1
 		for y <= location.y + 1 {
-			w.analize(NewIndex(x,y), turn, cache, changes)
+			w.analize(index{x:x,y:y}, turn, cache, changes)
 			y++
 		}
 		x++
@@ -190,9 +200,9 @@ func (w World) analizeNeighborsOf(location Index, turn int64, cache map[Index]in
 }
 
 func (w *World) Evolve() {
-	countCache := make(map[Index]int)
-	changes := make(map[Index]Change)
-	for cellLocation, _ := range(w.cells) {
+	countCache := make(map[index]int)
+	changes := make(map[index]Change)
+	for cellLocation := range(w.cells) {
 		w.analizeNeighborsOf(cellLocation, w.turn+1, countCache, changes)
 	}
 	w.turn++
