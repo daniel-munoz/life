@@ -5,7 +5,7 @@ import (
 
 	"atomicgo.dev/cursor"
 	"github.com/daniel-munoz/life/event"
-	"github.com/daniel-munoz/life/model"
+	"github.com/daniel-munoz/life/types"
 )
 
 const (
@@ -22,7 +22,7 @@ const (
 type Action func()
 
 // Show displays the world in a terminal window.
-func Show(w model.World, top, left, bottom, right int64) {
+func Show(w types.World, top, left, bottom, right int64) {
 	stopChannel := make(chan struct{})
 
 	cursor.Hide()
