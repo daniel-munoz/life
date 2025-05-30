@@ -1,7 +1,7 @@
 all: life
 
 life: **/*.go
-	go build -o life main.go
+	go build -o life -ldflags "-s -w" main.go
 
 test: **/*.go
 	go test -v ./...
