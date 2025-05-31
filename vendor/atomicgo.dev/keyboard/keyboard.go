@@ -49,6 +49,8 @@ func stopListener() error {
 
 			return fmt.Errorf("failed to reset console: %w", err)
 		}
+	} else {
+		fmt.Println("THERE WAS NO CONSOLE TO RESET")
 	}
 
 	return restoreInput()
