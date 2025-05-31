@@ -38,10 +38,11 @@ func (d *defaultDisplay) UpdateAndLock(content string, duration time.Duration) {
 	}()
 }
 
-func (d* defaultDisplay) Close() {
+func (d *defaultDisplay) Close() {
 	if d.closed {
 		return
 	}
+	d.closed = true
 	close(d.lock)
 }
 

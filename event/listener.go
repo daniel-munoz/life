@@ -1,17 +1,18 @@
 package event
 
 import (
-    "os"
-    "os/signal"
-    "syscall"
+	"os"
+	"os/signal"
+	"syscall"
 
-    "atomicgo.dev/keyboard"
-    "atomicgo.dev/keyboard/keys"
+	"atomicgo.dev/keyboard"
+	"atomicgo.dev/keyboard/keys"
 )
 
 type Listener interface {
 	Start()
 	Check() Event
+	Stop()
 }
 
 func NewListener() Listener {
@@ -34,7 +35,7 @@ func (gl *gameListener) Start() {
 	gl.running = true
 	gl.queue = make(chan Event)
 
-	go keyboard.Listen(func (k keys.Key) (bool, error) {
+	go keyboard.Listen(func(k keys.Key) (bool, error) {
 		event, stop := None, false
 		switch k.Code {
 		case keys.Up:
@@ -66,7 +67,7 @@ func (gl *gameListener) Start() {
 			case "h":
 				event = Help
 			default:
-		}
+			}
 		default:
 			event = None
 		}
@@ -80,6 +81,7 @@ func (gl *gameListener) Start() {
 		case s := <-sigs:
 			switch s {
 			case syscall.SIGTERM:
+				keyboard.SimulateKeyPress(rune('q'))
 				gl.queue <- Stop
 			}
 		}
@@ -99,5 +101,14 @@ func (gl *gameListener) Check() Event {
 		return event
 	default:
 		return None
+	}
+}
+
+func (gl *gameListener) Stop() {
+	if gl.running {
+		gl.running = false
+		if gl.queue != nil {
+			close(gl.queue)
+		}
 	}
 }
