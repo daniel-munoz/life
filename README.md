@@ -45,7 +45,7 @@ Once the simulation is running, use the following keys:
 ### Terminal Input Issue (Fixed)
 Previous versions had an issue where after running the program once, subsequent runs would display control characters literally (e.g., `^M` for Enter, `^C` for Ctrl-C) instead of processing them normally. This has been resolved through improved terminal state management and cleanup procedures.
 
-For technical details about this fix, see [CLAUDE.md](CLAUDE.md).
+For technical details about this fix, see [Terminal-Issues.md](Terminal-Issues.md).
 
 ## Contribution
 
