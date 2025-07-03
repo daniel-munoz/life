@@ -30,6 +30,10 @@ func listSamples() ([]string, error) {
 		samples = append(samples, sampleName)
 	}
 
+	if len(samples) == 0 {
+		return nil, fmt.Errorf("no samples available")
+	}
+
 	return samples, nil
 }
 
