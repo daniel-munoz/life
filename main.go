@@ -1,3 +1,5 @@
+// Package main provides the entry point for the Game of Life terminal application.
+// It loads sample patterns and displays them in an interactive terminal UI.
 package main
 
 import (
@@ -11,6 +13,14 @@ import (
 	"github.com/daniel-munoz/life/model"
 	"github.com/daniel-munoz/life/types"
 	"github.com/daniel-munoz/life/ui"
+)
+
+// Default view window coordinates for the initial display.
+const (
+	defaultViewTop    = -10
+	defaultViewLeft   = -10
+	defaultViewBottom = 40
+	defaultViewRight  = 80
 )
 
 // listSamples lists all available samples in the samples directory
@@ -106,5 +116,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	ui.Show(w, -10, -10, 40, 80)
+	ui.Show(w, defaultViewTop, defaultViewLeft, defaultViewBottom, defaultViewRight)
 }

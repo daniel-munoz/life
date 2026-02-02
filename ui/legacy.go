@@ -12,6 +12,13 @@ import (
 	"github.com/daniel-munoz/life/types"
 )
 
+// Timing constants for display updates.
+const (
+	helpDisplayDuration = 4500 * time.Millisecond // How long help text stays visible
+	frameDelay          = 200 * time.Millisecond  // Minimum time between frame updates
+)
+
+// options contains the help text shown when user presses 'h'.
 const (
 	options string = `Keys:
   Up   : moves window 1 space up       Down : moves window 1 space down
@@ -24,6 +31,28 @@ const (
 
 // Action is a function that updates the status of the world.
 type Action func()
+
+// runGameLoop runs the main game loop, handling display updates and event processing.
+func runGameLoop(w types.World, gameView *GameView, display Display, listener event.Listener) {
+	for {
+		if gameView.ShowHelp() {
+			display.UpdateAndLock(options, helpDisplayDuration)
+			gameView.ToggleHelp()
+		}
+		if !gameView.IsPaused() {
+			w.Evolve()
+		}
+
+		topLeft, bottomRight := gameView.TopLeft(), gameView.BottomRight()
+		display.UpdateAndLock(w.WindowContent(topLeft, bottomRight), frameDelay)
+
+		check := listener.Check()
+		gameView.Execute(check)
+		if gameView.Ended() {
+			return
+		}
+	}
+}
 
 // resetTerminal forces a terminal reset using stty to restore normal input mode
 func resetTerminal() {
@@ -60,26 +89,7 @@ func Show(w types.World, top, left, bottom, right int64) {
 
 	gameView := NewGameView(top, left, bottom, right, stopChannel)
 
-	go func() {
-		for {
-			if gameView.ShowHelp() {
-				display.UpdateAndLock(options, 4500*time.Millisecond)
-				gameView.ToggleHelp()
-			}
-			if !gameView.IsPaused() {
-				w.Evolve()
-			}
-
-			topLeft, bottomRight := gameView.TopLeft(), gameView.BottomRight()
-			display.UpdateAndLock(w.WindowContent(topLeft, bottomRight), 200*time.Millisecond)
-
-			check := listener.Check()
-			gameView.Execute(check)
-			if gameView.Ended() {
-				return
-			}
-		}
-	}()
+	go runGameLoop(w, gameView, display, listener)
 	for {
 		select {
 		case <-stopChannel:
