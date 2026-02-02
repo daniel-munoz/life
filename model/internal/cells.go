@@ -196,8 +196,8 @@ func (w World) countNeighborsOf(location index, cache map[index]int, offset int)
 	return count - offset
 }
 
-// analize determines if a cell should be born or die based on Game of Life rules.
-func (w World) analize(location index, turn int64, cache map[index]int, changes map[index]Change) {
+// analyze determines if a cell should be born or die based on Game of Life rules.
+func (w World) analyze(location index, turn int64, cache map[index]int, changes map[index]Change) {
 	_, cellHasChange := changes[location]
 	if cellHasChange {
 		return
@@ -218,13 +218,13 @@ func (w World) analize(location index, turn int64, cache map[index]int, changes 
 	}
 }
 
-// analizeNeighborsOf analyzes all 9 cells in the 3x3 grid centered on the given location.
-func (w World) analizeNeighborsOf(location index, turn int64, cache map[index]int, changes map[index]Change) {
+// analyzeNeighborsOf analyzes all 9 cells in the 3x3 grid centered on the given location.
+func (w World) analyzeNeighborsOf(location index, turn int64, cache map[index]int, changes map[index]Change) {
 	x := location.x - 1
 	for x <= location.x+1 {
 		y := location.y - 1
 		for y <= location.y+1 {
-			w.analize(index{x: x, y: y}, turn, cache, changes)
+			w.analyze(index{x: x, y: y}, turn, cache, changes)
 			y++
 		}
 		x++
@@ -236,7 +236,7 @@ func (w *World) Evolve() {
 	countCache := make(map[index]int)
 	changes := make(map[index]Change)
 	for cellLocation := range w.cells {
-		w.analizeNeighborsOf(cellLocation, w.turn+1, countCache, changes)
+		w.analyzeNeighborsOf(cellLocation, w.turn+1, countCache, changes)
 	}
 	w.turn++
 	w.changes = len(changes)
