@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/daniel-munoz/life/types"
 	"github.com/daniel-munoz/life/model/internal"
+	"github.com/daniel-munoz/life/types"
 )
 
+// ReadWorld loads a world pattern from a .life file in the samples directory.
+// Non-space characters in the file represent living cells.
 func ReadWorld(sampleName string) (types.World, error) {
 	var (
 		x, y    int64

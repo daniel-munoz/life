@@ -6,6 +6,9 @@ import (
 	"github.com/daniel-munoz/life/types"
 )
 
+// pageScrollAmount is the number of cells to scroll when using page navigation keys.
+const pageScrollAmount = 10
+
 // GameView is the view of the game. It shows the world in a view window, defined
 // by the top, left, bottom and right coordinates. It also keeps the status of the
 // pause and help flags.
@@ -46,20 +49,20 @@ func NewGameView(top, left, bottom, right int64, stopChannel chan struct{}) *Gam
 			gv.right++
 		},
 		event.PageUp: func() {
-			gv.top -= 10
-			gv.bottom -= 10
+			gv.top -= pageScrollAmount
+			gv.bottom -= pageScrollAmount
 		},
 		event.PageDown: func() {
-			gv.top += 10
-			gv.bottom += 10
+			gv.top += pageScrollAmount
+			gv.bottom += pageScrollAmount
 		},
 		event.PageLeft: func() {
-			gv.left -= 10
-			gv.right -= 10
+			gv.left -= pageScrollAmount
+			gv.right -= pageScrollAmount
 		},
 		event.PageRight: func() {
-			gv.left += 10
-			gv.right += 10
+			gv.left += pageScrollAmount
+			gv.right += pageScrollAmount
 		},
 		event.Help: func() {
 			gv.showHelp = true
