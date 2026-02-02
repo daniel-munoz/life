@@ -534,7 +534,7 @@ func TestWorld_Analize(t *testing.T) {
 			}
 
 			// Analyze target cell
-			w.analize(tt.target, tt.turn, cache, changes)
+			w.analyze(tt.target, tt.turn, cache, changes)
 
 			// Check if change was recorded
 			change, hasChange := changes[tt.target]
@@ -620,7 +620,7 @@ func TestWorld_AnalizeNeighborsOf(t *testing.T) {
 			}
 
 			// Analyze neighbors
-			w.analizeNeighborsOf(tt.target, tt.turn, cache, changes)
+			w.analyzeNeighborsOf(tt.target, tt.turn, cache, changes)
 
 			// Verify changes
 			for loc, wantReason := range tt.wantChanges {
